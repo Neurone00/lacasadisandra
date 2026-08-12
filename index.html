@@ -37,9 +37,11 @@
   </ul>
 </nav>
 
-<!-- no src/source here: script.js fetches the whole file itself and hands the
-     browser a complete blob, so scrubbing never stalls on network (see there) -->
-<video id="video" class="bg-video" muted playsinline poster="assets/img/poster.jpg"></video>
+<!-- scroll draws a still frame per position (see script.js) — a <canvas> paint
+     has no per-frame decode cost, unlike seeking a <video>, which was the
+     real source of the reported mobile jank. Poster shows instantly via CSS
+     while the frame sequence preloads. -->
+<canvas id="scene" class="bg-video"></canvas>
 <div class="video-gradient"></div>
 
 <main class="rooms">
