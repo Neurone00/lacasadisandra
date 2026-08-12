@@ -142,27 +142,38 @@ body.is-loading { overflow: hidden; height: 100vh; }
 
 .room {
   scroll-snap-align: start;
-  display: flex; align-items: flex-end; justify-content: center;
-  text-align: center;
-  padding: 0 24px max(10vh, env(safe-area-inset-bottom));
 }
 
+/* ponytail: text is `position: fixed` and placed by JS at a tracked point in
+   the footage (see anchors.json + updateAnchoredText in script.js), not laid
+   out by its `.room` parent — the parent only exists for scroll-snap + spacing.
+   Default left/top is the viewport center, used as-is for rooms with no
+   tracked anchor (the outro slice); tracked rooms get an inline override. */
 .room-text {
+  position: fixed;
+  left: 50%; top: 50%;
+  max-width: 78vw;
+  text-align: center;
+  padding: .5em .9em;
+  border-radius: 18px;
+  background: rgba(20, 14, 12, .32);
+  backdrop-filter: blur(6px);
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity .7s ease, transform .7s ease;
+  transform: translate(-50%, -50%) scale(.88);
+  transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1);
+  pointer-events: none;
 }
-.room.in-view .room-text { opacity: 1; transform: translateY(0); }
+.room.in-view .room-text { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
 .room-text h2 {
   margin: 0 0 .3rem;
-  font-size: clamp(1.8rem, 7vw, 2.6rem);
+  font-size: clamp(1.6rem, 6.2vw, 2.3rem);
   font-style: italic;
   text-shadow: 0 2px 18px rgba(0,0,0,.5);
 }
 .room-text p {
   margin: 0;
-  font-size: clamp(.95rem, 3.6vw, 1.1rem);
+  font-size: clamp(.9rem, 3.3vw, 1.05rem);
   font-weight: 400;
   opacity: .9;
   text-shadow: 0 2px 12px rgba(0,0,0,.5);
@@ -173,7 +184,6 @@ body.is-loading { overflow: hidden; height: 100vh; }
   font-size: 1.6rem;
 }
 .room--outro {
-  align-items: center;
   /* ponytail: mandatory snap needs a snap point AT the true document end,
      otherwise the browser can never settle past this section's start and
      the scroll-to-loop reset below never fires. `end` gives it that point. */
