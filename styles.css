@@ -7,12 +7,6 @@
 
 * { box-sizing: border-box; }
 
-html {
-  /* ponytail: mandatory snap gives a firm "stop" per room as requested;
-     switch to `proximity` if fast flicks on Android ever feel too abrupt */
-  scroll-snap-type: y mandatory;
-}
-
 body {
   margin: 0;
   font-family: 'Playfair Display', serif;
@@ -140,28 +134,39 @@ body.is-loading { overflow: hidden; height: 100vh; }
 /* ---------- room text ---------- */
 .rooms { position: relative; z-index: 2; }
 
-.room {
-  scroll-snap-align: start;
-}
-
-/* caption is `position: fixed` at the viewport center, independent of its
-   `.room` parent (which only exists for scroll-snap + spacing) — it scales
-   and fades in in place rather than sliding up from the bottom */
+/* caption is `position: fixed`, independent of its `.room` parent (which only
+   exists to size the scroll track + drive the time-based reveal in script.js).
+   It rises out of the screen (perspective + translateZ + scale) and fades in;
+   reveal is delayed until deep in the room, so it never overlaps the blurry
+   walk-between-rooms frames.
+   ponytail: perspective() is applied *inline*, in this element's own transform
+   — putting `perspective` on an ancestor instead would make that ancestor the
+   containing block for this fixed-position element (per spec), breaking
+   "fixed to viewport" and positioning it relative to the 5000px-tall page. */
 .room-text {
   position: fixed;
   left: 50%; top: 50%;
-  max-width: 78vw;
+  max-width: 64vw;
   text-align: center;
   padding: .5em .9em;
   border-radius: 18px;
   background: rgba(20, 14, 12, .32);
   backdrop-filter: blur(6px);
   opacity: 0;
-  transform: translate(-50%, -50%) scale(.88);
-  transition: opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1);
+  transform: perspective(900px) translate(-50%, -50%) translateZ(-260px) scale(.8);
+  transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1);
   pointer-events: none;
 }
-.room.in-view .room-text { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.room.in-view .room-text { opacity: 1; transform: perspective(900px) translate(-50%, -50%) translateZ(0) scale(1); }
+
+/* a different resting spot per room so captions don't all land dead-center */
+#ingresso .room-text       { top: 38%; }
+#cucina .room-text         { top: 58%; left: 58%; }
+#bagno .room-text          { top: 62%; }
+#camera .room-text         { top: 40%; left: 43%; }
+#cabina-armadio .room-text { top: 60%; left: 57%; }
+#studio .room-text         { top: 42%; }
+#soggiorno .room-text      { top: 58%; left: 44%; }
 
 .room-text h2 {
   margin: 0 0 .3rem;
@@ -180,10 +185,4 @@ body.is-loading { overflow: hidden; height: 100vh; }
 .room-text--outro p {
   font-family: 'Parisienne', cursive;
   font-size: 1.6rem;
-}
-.room--outro {
-  /* ponytail: mandatory snap needs a snap point AT the true document end,
-     otherwise the browser can never settle past this section's start and
-     the scroll-to-loop reset below never fires. `end` gives it that point. */
-  scroll-snap-align: end;
 }

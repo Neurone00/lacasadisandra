@@ -1,7 +1,11 @@
 const video = document.getElementById('video');
 const preloader = document.getElementById('preloader');
 const fill = document.getElementById('preloader-fill');
-const rooms = document.querySelectorAll('.room');
+const rooms = [...document.querySelectorAll('.room')].map((el) => ({
+  el,
+  start: +el.dataset.start,
+  end: +el.dataset.end,
+}));
 
 let ready = false;
 let looping = false;
@@ -35,6 +39,7 @@ function onScroll() {
   const y = Math.min(window.scrollY, max);
   const progress = max > 0 ? y / max : 0;
   video.currentTime = progress * video.duration;
+  updateCaptions(video.currentTime);
 
   if (progress >= 0.999) {
     if (!looping) { looping = true; window.scrollTo(0, 0); }
@@ -50,10 +55,18 @@ function onScrollThrottled() {
 window.addEventListener('scroll', onScrollThrottled, { passive: true });
 window.addEventListener('resize', onScrollThrottled);
 
-const io = new IntersectionObserver((entries) => {
-  entries.forEach((e) => e.target.classList.toggle('in-view', e.isIntersecting));
-}, { threshold: 0.55 });
-rooms.forEach((r) => io.observe(r));
+// ponytail: reveal is keyed off video.currentTime against each room's own
+// [start, end] (not scroll/viewport geometry) — several sections are shorter
+// than one viewport height, so an IntersectionObserver-based "is this section
+// centered on screen" check flips to the neighboring room before the video's
+// actual time has entered it. Time is the source of truth we already have.
+function updateCaptions(t) {
+  for (const r of rooms) {
+    const margin = Math.max(0.4, (r.end - r.start) * 0.2);
+    const inRoom = t >= r.start + margin && t <= r.end - margin;
+    r.el.classList.toggle('in-view', inRoom);
+  }
+}
 
 // ---- hamburger drawer ----
 const hamburger = document.getElementById('hamburger');
