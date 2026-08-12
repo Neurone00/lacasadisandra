@@ -27,19 +27,35 @@ function updateProgress() {
   if (!video.duration || !video.buffered.length) return;
   const buffered = video.buffered.end(video.buffered.length - 1);
   fill.style.width = Math.min(100, (buffered / video.duration) * 100) + '%';
-  if (buffered >= video.duration - 0.15) onReady();
+  // ponytail: a paused, never-played video isn't guaranteed to fully buffer —
+  // `preload="auto"` is just a hint, and Chrome in particular can plateau
+  // partway and stop firing `progress`, which left this stuck forever. A few
+  // seconds of head start is enough; scrubbing into not-yet-buffered range
+  // just triggers another (Range-supported) fetch, worst case a brief stall.
+  if (buffered >= Math.min(4, video.duration)) onReady();
 }
 video.addEventListener('progress', updateProgress);
 video.addEventListener('loadedmetadata', updateProgress);
 video.addEventListener('canplaythrough', onReady, { once: true });
+setTimeout(onReady, 6000); // hard backstop — never leave the user stuck
+
+const FRAME_TIME = 1 / 30; // source video is ~30fps
+let lastSeekedTime = -1;
 
 function onScroll() {
   if (!ready || !video.duration) return;
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const y = Math.min(window.scrollY, max);
   const progress = max > 0 ? y / max : 0;
-  video.currentTime = progress * video.duration;
-  updateCaptions(video.currentTime);
+  const t = progress * video.duration;
+  // ponytail: seeking is a real decode, not free — rAF can fire ~60/s but the
+  // video only has ~30 distinct frames/s, so half those seeks retargeted the
+  // same frame and were pure jank. Skip ones smaller than one video frame.
+  if (Math.abs(t - lastSeekedTime) >= FRAME_TIME) {
+    video.currentTime = t;
+    lastSeekedTime = t;
+  }
+  updateCaptions(t);
 
   if (progress >= 0.999) {
     if (!looping) { looping = true; window.scrollTo(0, 0); }
