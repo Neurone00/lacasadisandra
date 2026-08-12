@@ -144,11 +144,9 @@ body.is-loading { overflow: hidden; height: 100vh; }
   scroll-snap-align: start;
 }
 
-/* ponytail: text is `position: fixed` and placed by JS at a tracked point in
-   the footage (see anchors.json + updateAnchoredText in script.js), not laid
-   out by its `.room` parent — the parent only exists for scroll-snap + spacing.
-   Default left/top is the viewport center, used as-is for rooms with no
-   tracked anchor (the outro slice); tracked rooms get an inline override. */
+/* caption is `position: fixed` at the viewport center, independent of its
+   `.room` parent (which only exists for scroll-snap + spacing) — it scales
+   and fades in in place rather than sliding up from the bottom */
 .room-text {
   position: fixed;
   left: 50%; top: 50%;

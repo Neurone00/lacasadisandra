@@ -7,8 +7,8 @@ No build step, no framework: plain HTML/CSS/JS.
 - CSS `scroll-snap` gives the per-room "stop"
 - `IntersectionObserver` fades captions in/out
 - JS maps scroll position → `video.currentTime` (the one thing CSS can't do)
-- Section heights are weighted by each room's real duration in the source video, so captions stay in sync with what's on screen
-- Each caption is pinned to a hand-picked landmark (a lamp, a clock, a doorframe...) tracked frame-by-frame with optical flow (`tools_track_anchors.py`, one-off script, needs `opencv-python-headless`) → `assets/anchors.json`. The caption fades/scales in centered on that point and follows it as the camera pans. Tracking is lost near a few segment edges (fast whip-pans); those frames just hold the last known position rather than guessing.
+- Section heights are weighted by each room's real duration in the source video (re-measured by eye at 2fps per room, not guessed), so captions stay in sync with what's on screen
+- Each caption fades + scales in centered in the viewport (no slide-in)
 
 ## Run locally
 
