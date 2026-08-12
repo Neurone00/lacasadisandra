@@ -23,21 +23,35 @@ function onReady() {
   onScroll();
 }
 
-function updateProgress() {
-  if (!video.duration || !video.buffered.length) return;
-  const buffered = video.buffered.end(video.buffered.length - 1);
-  fill.style.width = Math.min(100, (buffered / video.duration) * 100) + '%';
-  // ponytail: a paused, never-played video isn't guaranteed to fully buffer —
-  // `preload="auto"` is just a hint, and Chrome in particular can plateau
-  // partway and stop firing `progress`, which left this stuck forever. A few
-  // seconds of head start is enough; scrubbing into not-yet-buffered range
-  // just triggers another (Range-supported) fetch, worst case a brief stall.
-  if (buffered >= Math.min(4, video.duration)) onReady();
-}
-video.addEventListener('progress', updateProgress);
-video.addEventListener('loadedmetadata', updateProgress);
-video.addEventListener('canplaythrough', onReady, { once: true });
-setTimeout(onReady, 6000); // hard backstop — never leave the user stuck
+// ponytail: a declarative <video preload="auto"> is only a hint — measured in
+// Chrome, a paused/never-played video's buffering plateaus around ~57% and
+// goes network-idle for good, and `canplaythrough` fires well before that,
+// so neither gives a real "fully buffered" signal. Scrubbing past the
+// plateau then stalls on a genuine network fetch, which is the dominant
+// source of jank on mobile. Fetching the file ourselves and handing the
+// browser one complete blob sidesteps the heuristic: every seek afterward is
+// served from memory, guaranteed. Progress bar is real bytes, not a guess.
+const SRC = video.canPlayType('video/webm; codecs="vp9"') ? 'assets/video/casa.webm' : 'assets/video/casa.mp4';
+fetch(SRC).then(async (res) => {
+  const total = +res.headers.get('content-length') || 0;
+  const reader = res.body.getReader();
+  const chunks = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    received += value.length;
+    if (total) fill.style.width = Math.min(100, (received / total) * 100) + '%';
+  }
+  video.src = URL.createObjectURL(new Blob(chunks, { type: res.headers.get('content-type') || 'video/mp4' }));
+  video.addEventListener('loadedmetadata', onReady, { once: true });
+}).catch(() => {
+  // fetch itself failed (offline, etc.) — fall back to normal streaming
+  video.src = SRC;
+  video.addEventListener('loadedmetadata', onReady, { once: true });
+});
+setTimeout(onReady, 20000); // hard backstop — never leave the user stuck
 
 const FRAME_TIME = 1 / 30; // source video is ~30fps
 let lastSeekedTime = -1;
