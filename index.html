@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>lacasadisandra</title>
+<meta name="description" content="Un giro per casa, stanza per stanza — scorri per esplorare.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="is-loading">
+
+<div id="preloader" class="preloader">
+  <div class="preloader-logo">lacasadisandra</div>
+  <div class="preloader-bar"><div id="preloader-fill" class="preloader-fill"></div></div>
+</div>
+
+<header class="site-header">
+  <button id="hamburger" class="hamburger" aria-label="Apri menu" aria-expanded="false" aria-controls="drawer">
+    <span></span><span></span><span></span>
+  </button>
+  <span class="logo">lacasadisandra</span>
+</header>
+
+<div id="scrim" class="scrim"></div>
+<nav id="drawer" class="drawer" aria-label="Stanze">
+  <ul>
+    <li><a href="#ingresso">Ingresso</a></li>
+    <li><a href="#cucina">Cucina</a></li>
+    <li><a href="#bagno">Bagno</a></li>
+    <li><a href="#camera">Camera da letto</a></li>
+    <li><a href="#cabina-armadio">Cabina armadio</a></li>
+    <li><a href="#studio">Studio</a></li>
+    <li><a href="#soggiorno">Soggiorno</a></li>
+  </ul>
+</nav>
+
+<video id="video" class="bg-video" muted playsinline preload="auto" poster="assets/img/poster.jpg">
+  <source src="assets/video/casa.webm" type="video/webm">
+  <source src="assets/video/casa.mp4" type="video/mp4">
+</video>
+<div class="video-gradient"></div>
+
+<main class="rooms">
+  <section id="ingresso" class="room" style="height:75.9vh">
+    <div class="room-text"><h2>Ingresso</h2><p>Il profumo di casa accoglie fin dalla soglia.</p></div>
+  </section>
+  <section id="cucina" class="room" style="height:56.9vh">
+    <div class="room-text"><h2>Cucina</h2><p>Luce del mattino e tavola apparecchiata per due.</p></div>
+  </section>
+  <section id="bagno" class="room" style="height:94.9vh">
+    <div class="room-text"><h2>Bagno</h2><p>Un angolo di quiete, tra piante e luce naturale.</p></div>
+  </section>
+  <section id="camera" class="room" style="height:94.9vh">
+    <div class="room-text"><h2>Camera da letto</h2><p>Lenzuola morbide e la valigia pronta per partire.</p></div>
+  </section>
+  <section id="cabina-armadio" class="room" style="height:75.9vh">
+    <div class="room-text"><h2>Cabina armadio</h2><p>Ogni cosa al suo posto, pronta da indossare.</p></div>
+  </section>
+  <section id="studio" class="room" style="height:75.9vh">
+    <div class="room-text"><h2>Studio</h2><p>La scrivania dove nascono le idee, tra libri e luce di pomeriggio.</p></div>
+  </section>
+  <section id="soggiorno" class="room" style="height:75.9vh">
+    <div class="room-text"><h2>Soggiorno</h2><p>Il divano perfetto per rilassarsi a fine giornata.</p></div>
+  </section>
+  <section class="room room--outro" style="height:149.9vh">
+    <div class="room-text room-text--outro"><p>torna all'inizio &#8635;</p></div>
+  </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
