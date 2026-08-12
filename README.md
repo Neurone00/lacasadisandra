@@ -24,6 +24,8 @@ Static files, served as-is via GitHub Pages (root of `main`).
 
 ## Regenerating the frame sequence
 
+Run from this repo's root, against the original walkthrough video (not included here):
+
 ```
-ffmpeg -i original.mp4 -vf fps=12 -c:v libwebp -quality 70 site/assets/frames/f%04d.webp
+ffmpeg -i /path/to/original.mp4 -vf fps=12 -c:v libwebp -quality 70 assets/frames/f%04d.webp
 ```
